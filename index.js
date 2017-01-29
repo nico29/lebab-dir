@@ -18,6 +18,7 @@ const cli = meow(`
       --transorom, -t  Name a lebab transform to apply
       --output, -o The output directory
       --replace, -r Replaces the input once the transform is applied
+			--verbose, -v Prompt lebab warnings
 
     Examples
       $ lebab-dir . --output code/es2015 --transform arrow
@@ -30,11 +31,11 @@ const cli = meow(`
 	}
 });
 
-function transform(input, output, transforms, replace) {
-	let outputPath = path.resolve(replace ? input : output);
-	console.log(chalk.cyan(`applying ${transforms} to ${input}`));
-	const {code, warnings} = lebab.transform(fs.readFileSync(input, 'utf8'), transforms);
-	if (warnings) {
+function transform(opts) {
+	let outputPath = path.resolve(opts.replace ? opts.input : opts.output);
+	console.log(chalk.cyan(`applying ${opts.transforms} to ${opts.input}`));
+	const {code, warnings} = lebab.transform(fs.readFileSync(opts.input, 'utf8'), opts.transforms);
+	if (warnings && opts.verbose) {
 		warnings.forEach(warning => {
 			console.log(chalk.yellow(`⚠︎ ${warning.msg} for transform ${warning.type} at line ${warning.line}`));
 		});
@@ -56,16 +57,17 @@ function computeOutputFileName(input, output, inputDirectory) {
 	return path.resolve(__dirname, outputFilePath.join(path.sep));
 }
 
-const usesLebabReplace = cli.flags.replace;
+const inputs = cli.input[0];
+const replace = cli.flags.replace;
+const output = cli.flags.output;
+const verbose = cli.flags.verbose;
+let transforms = cli.flags.transform;
+
 // replace option and output option are incompatible
-if (usesLebabReplace && cli.flags.output) {
+if (replace && output) {
 	console.log(chalk.red(`✖ replace and output options are not compatible`));
 	process.exit(1);
 }
-
-const inputs = cli.input[0];
-const output = cli.flags.output;
-let transforms = cli.flags.transform;
 
 if (!inputs) {
 	console.log(chalk.red(`✖ input is needed`));
@@ -75,26 +77,38 @@ if (!inputs) {
 if (!transforms) {
 	console.log(chalk.red(`✖ transform is needed`));
 	process.exit(1);
-} else {
-	transforms = transforms.split(',');
 }
+transforms = transforms.split(',');
 
 const inputPath = path.resolve(__dirname, inputs);
 const inputStats = fs.statSync(inputPath);
 const outputPath = path.resolve(__dirname, output);
 const isDirectory = inputStats.isDirectory();
 const isFile = inputStats.isFile();
+
 if (!isFile && !isDirectory) {
 	console.log(chalk.red(`✖ input is not valid file or directory`));
 	process.exit(1);
 }
 
 if (isFile) {
-	transform(inputPath, outputPath, transforms, usesLebabReplace);
+	transform({
+		input: inputPath,
+		output: outputPath,
+		transforms,
+		replace,
+		verbose
+	});
 	console.log(chalk.green('✔︎︎ all done'));
 } else {
 	glob.sync(`${inputPath}/**/*.js`).forEach(file => {
-		transform(file, computeOutputFileName(file, outputPath, inputPath), transforms, usesLebabReplace);
+		transform({
+			input: file,
+			output: computeOutputFileName(file, outputPath, inputPath),
+			transforms,
+			replace,
+			verbose
+		});
 	});
 	console.log(chalk.green('✔︎︎ all done'));
 }

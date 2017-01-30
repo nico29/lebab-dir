@@ -32,7 +32,7 @@ const cli = meow(`
 });
 
 function transform(opts) {
-	let outputPath = path.resolve(opts.replace ? opts.input : opts.output);
+	let outputPath = opts.output;
 	console.log(chalk.cyan(`applying ${opts.transforms} to ${opts.input}`));
 	const {code, warnings} = lebab.transform(fs.readFileSync(opts.input, 'utf8'), opts.transforms);
 	if (warnings && opts.verbose) {
@@ -82,7 +82,7 @@ transforms = transforms.split(',');
 
 const inputPath = path.resolve(process.cwd(), inputs);
 const inputStats = fs.statSync(inputPath);
-const outputPath = path.resolve(process.cwd(), output);
+const outputPath = replace ? inputPath : path.resolve(process.cwd(), output);
 const isDirectory = inputStats.isDirectory();
 const isFile = inputStats.isFile();
 
@@ -96,7 +96,6 @@ if (isFile) {
 		input: inputPath,
 		output: outputPath,
 		transforms,
-		replace,
 		verbose
 	});
 	console.log(chalk.green('✔︎︎ all done'));
@@ -106,7 +105,6 @@ if (isFile) {
 			input: file,
 			output: computeOutputFileName(file, outputPath, inputPath),
 			transforms,
-			replace,
 			verbose
 		});
 	});

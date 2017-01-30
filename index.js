@@ -54,7 +54,7 @@ function computeOutputFileName(input, output, inputDirectory) {
 
 	splittedInput = splittedInput.slice(splittedInput.findIndex(part => part === mainInputDirectory) + 1, splittedInput.length);
 	let outputFilePath = splittedOutput.concat(splittedInput);
-	return path.resolve(__dirname, outputFilePath.join(path.sep));
+	return path.resolve(process.cwd(), outputFilePath.join(path.sep));
 }
 
 const inputs = cli.input[0];
@@ -80,9 +80,9 @@ if (!transforms) {
 }
 transforms = transforms.split(',');
 
-const inputPath = path.resolve(__dirname, inputs);
+const inputPath = path.resolve(process.cwd(), inputs);
 const inputStats = fs.statSync(inputPath);
-const outputPath = path.resolve(__dirname, output);
+const outputPath = path.resolve(process.cwd(), output);
 const isDirectory = inputStats.isDirectory();
 const isFile = inputStats.isFile();
 

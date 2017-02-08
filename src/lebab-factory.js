@@ -8,10 +8,10 @@ const mkdirp = require('mkdirp');
 const glob = require('glob');
 
 class LebabFactory {
-	constructor(input, output, transforms = [], opts) {
+	constructor(input, output, transforms = [], opts = {}) {
 		this.input = input;
 		this.output = output;
-		this.transforms = transforms.split(',');
+		this.transforms = transforms.split(',').filter(t => t);
 		this.verbose = opts.verbose;
 		this.replace = opts.replace;
 

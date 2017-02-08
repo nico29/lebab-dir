@@ -13,9 +13,16 @@
     "mkdirp": "^0.5.1"
   },
   "scripts": {
-    "test": "xo"
+    "test": "xo && ava --verbose && rm -r test/output"
   },
   "devDependencies": {
+    "ava": "^0.18.1",
     "xo": "^0.17.1"
+  },
+  "ava": {
+    "files":[
+      "test/*.js",
+      "!test/input/*.js"
+    ]
   }
 }

@@ -22,8 +22,8 @@
     "test": "xo && ava --verbose && rm -r test/output"
   },
   "devDependencies": {
-    "ava": "^0.18.1",
-    "xo": "^0.17.1"
+    "ava": "^0.19.1",
+    "xo": "^0.18.2"
   },
   "ava": {
     "files":[

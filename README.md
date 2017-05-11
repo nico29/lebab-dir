@@ -1,5 +1,7 @@
 ## Synopsis
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/nico29/lebab-dir.svg)](https://greenkeeper.io/)
+
 Cli wrapper around [lebab](https://lebab.io) to allow input and output to be a directory.
 The `replace` option can still be used.
 
